@@ -7,6 +7,11 @@ import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
+/*
+    Concurrency handling, serial & concurrent tasks, critical sections,
+    synchronization handling
+ */
+
 fun main() {
     runSerial()
     //runSerialRxJava()
@@ -39,6 +44,10 @@ private fun someAsyncTaskRxJava(iteration: Int): Single<Int> {
 //  Serial tasks
 //  ****
 
+/*
+    This will execute all 3 tasks sequentially in specified order.
+    It should complete all tasks in 5.5 seconds in order 2, 1, 3
+ */
 private fun runSerial() = GlobalScope.launch(Dispatchers.IO) {
     async { someAsyncTask(2) }.await()
     async { someAsyncTask(1) }.await()
@@ -59,6 +68,10 @@ private fun runSerialRxJava() {
 //  Concurrent tasks
 //  ****
 
+/*
+    This will execute all 3 tasks concurrently without specified order.
+    It should complete all tasks in 3 seconds in order of 3, 2, 1
+ */
 private fun runConcurrent() = GlobalScope.launch(Dispatchers.IO) {
     awaitAll(
         async { someAsyncTask(2) },
@@ -83,6 +96,9 @@ private fun runConcurrentRxJava() {
 
 private var sharedValue = 0
 
+/*
+    This will output inconsistent Counter value
+ */
 private fun runWithoutCriticalProtection() = GlobalScope.launch {
     someErrorProneThreadLoop {
         sharedValue++
@@ -90,6 +106,10 @@ private fun runWithoutCriticalProtection() = GlobalScope.launch {
     println("Counter = $sharedValue")
 }
 
+/*
+    This will always output 10000
+    Keep in mind not to nest mutexes like the synchronized blocks as it can result in easy deadlock
+ */
 private fun runWithCriticalProtection() = GlobalScope.launch {
     val mutex = Mutex()
     someErrorProneThreadLoop {
@@ -122,6 +142,10 @@ private suspend fun someErrorProneThreadLoop(action: suspend () -> Unit) {
 var syncDeferred: Deferred<Boolean>? = null
 val syncMutex = Mutex()
 
+/*
+    The aim is not to call the synchronization code until the previous call is finished
+    and reuse the result of the previous call
+ */
 private suspend fun synchronizeSomething(value: Int): Deferred<Boolean> = coroutineScope {
     syncMutex.withLock {
         syncDeferred?.let {
@@ -138,6 +162,16 @@ private suspend fun synchronizeSomething(value: Int): Deferred<Boolean> = corout
     }
 }
 
+/*
+    This shall output:
+    I return things nicely 1
+    I return things nicely 3
+
+    Removing mutex from synchronizeSomething will result in:
+    I return things nicely 1
+    I return things nicely 2
+    I return things nicely 3
+ */
 private fun syncSomething() = GlobalScope.launch {
     launch {
         synchronizeSomething(1).await()
