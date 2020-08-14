@@ -9,4 +9,7 @@ Playground for Kotlin Coroutines
 * Concurrent & serial tasks. Comparison with RxJava.
 * Critical section handling
 * Resource access from different threads
+* Channels, BroadcastChannels, ConflatedBroadcastChannels
+* Channel buffers
+* Differences between Channels and Flows
 ```
