@@ -7,6 +7,8 @@ fun main() {
     //testBasicFlowCollect()
     //testBasicFlowDistinctCollection()
     //testBasicFlowDebounceCollection()
+    //testSharedFlow()
+    //testStateFlow()
 }
 
 //  ****
@@ -48,5 +50,38 @@ fun basicFlow() : Flow<Int> = flow {
         emit(i)
         emit(i)
         if (i == 3) throw Error()
+    }
+}
+
+//  ****
+//  Shared/State Flow
+//  ****
+
+val sharedFlow = MutableSharedFlow<Int>(replay = 1)
+val stateFlow = MutableStateFlow(69)
+
+fun testSharedFlow() = runBlocking {
+    sharedFlow.asSharedFlow().onEach {
+        println("SharedFlow value: $it")
+    }.launchIn(this)
+
+    for (i in 0 until 3) {
+        sharedFlow.tryEmit(i)
+        delay(100)
+        sharedFlow.tryEmit(i)
+        delay(100)
+    }
+}
+
+fun testStateFlow() = runBlocking {
+    stateFlow.asStateFlow().onEach {
+        println("StateFlow value: $it")
+    }.launchIn(this)
+
+    for (i in 0 until 3) {
+        stateFlow.value = i
+        delay(100)
+        stateFlow.value = i
+        delay(100)
     }
 }
