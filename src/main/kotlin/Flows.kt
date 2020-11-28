@@ -1,14 +1,17 @@
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 
 fun main() {
-    testBasicFlowOperators()
+    //testBasicFlowOperators()
     //testBasicFlowCollect()
     //testBasicFlowDistinctCollection()
     //testBasicFlowDebounceCollection()
     //testSharedFlow()
     //testStateFlow()
+    //testDummyFlowWithConcurrentEmissions()
+    //testCallbackFlowWithConcurrentEmissions()
+    //testChannelFlowWithConcurrentEmissions()
 }
 
 //  ****
@@ -45,7 +48,7 @@ fun testBasicFlowDebounceCollection() = runBlocking {
     }
 }
 
-fun basicFlow() : Flow<Int> = flow {
+fun basicFlow(): Flow<Int> = flow {
     for (i in 0 until 3) {
         emit(i)
         emit(i)
@@ -84,4 +87,48 @@ fun testStateFlow() = runBlocking {
         stateFlow.value = i
         delay(100)
     }
+}
+
+//  ****
+//  Callback/Channel Flow
+//  ****
+
+fun testDummyFlowWithConcurrentEmissions() = runBlocking {
+    dummyFlow().collect {
+        println("DummyFlow value: $it")
+    }
+}
+
+fun testCallbackFlowWithConcurrentEmissions() = runBlocking {
+    callbackFlow().collect {
+        println("CallbackFlow value: $it")
+    }
+}
+
+fun testChannelFlowWithConcurrentEmissions() = runBlocking {
+    channelFlow().collect {
+        println("ChannelFlow value: $it")
+    }
+}
+
+fun dummyFlow(): Flow<Int> = flow {
+    GlobalScope.launch {
+        emit(1)
+    }
+}
+
+fun callbackFlow(): Flow<Int> = callbackFlow {
+    GlobalScope.launch {
+        offer(1)
+        close()
+    }
+    awaitClose { cancel() }
+}
+
+fun channelFlow(): Flow<Int> = channelFlow {
+    GlobalScope.launch {
+        offer(1)
+        close()
+    }
+    awaitClose { cancel() }
 }
