@@ -12,4 +12,7 @@ Playground for Kotlin Coroutines
 * Channels, BroadcastChannels, ConflatedBroadcastChannels
 * Channel buffers
 * Differences between Channels and Flows
+* Basic Flow operators
+* State & Shared Flows
+* Callback & Channel Flows
 ```

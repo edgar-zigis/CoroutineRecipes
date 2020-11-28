@@ -3,10 +3,12 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 
 fun main() {
-    //testBasicFlowOperators()
+    testBasicFlowOperators()
     //testBasicFlowCollect()
     //testBasicFlowDistinctCollection()
     //testBasicFlowDebounceCollection()
+    //testBasicFlowTakeCollection()
+    //testBasicFlowGargantuanCollection()
     //testSharedFlow()
     //testStateFlow()
     //testDummyFlowWithConcurrentEmissions()
@@ -48,13 +50,33 @@ fun testBasicFlowDebounceCollection() = runBlocking {
     }
 }
 
+fun testBasicFlowTakeCollection() = runBlocking {
+    basicFlow().take(3).collect {
+        println("BasicFlowDebounceCollect emitted value: $it")
+    }
+}
+
+fun testBasicFlowGargantuanCollection() = runBlocking {
+    val someWeirdSum = basicFlow().onEach {
+        delay(200)
+        println("Computing $it")
+    }.filter {
+        it % 2 == 0
+    }.map {
+        it + 2
+    }.reduce { accumulator, value ->
+        accumulator + value
+    }
+    println("SomeGargantuanSum: $someWeirdSum")
+}
+
 fun basicFlow(): Flow<Int> = flow {
     for (i in 0 until 3) {
         emit(i)
         emit(i)
         if (i == 3) throw Error()
     }
-}
+}.flowOn(Dispatchers.IO)
 
 //  ****
 //  Shared/State Flow
