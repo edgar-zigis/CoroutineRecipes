@@ -20,7 +20,7 @@ fun main() {
     //runWithoutCriticalProtection()
     //runWithCriticalProtection()
     //syncSomething()
-    Thread.sleep(10000)
+    //Thread.sleep(10000)
 }
 
 //  ****
@@ -48,7 +48,7 @@ private fun someAsyncTaskRxJava(iteration: Int): Single<Int> {
     This will execute all 3 tasks sequentially in specified order.
     It should complete all tasks in 5.5 seconds in order 2, 1, 3
  */
-private fun runSerial() = GlobalScope.launch(Dispatchers.IO) {
+private fun runSerial() = runBlocking {
     async { someAsyncTask(2) }.await()
     async { someAsyncTask(1) }.await()
     async { someAsyncTask(3) }.await()
@@ -62,6 +62,7 @@ private fun runSerialRxJava() {
     }
         .subscribeOn(Schedulers.io())
         .subscribe()
+    Thread.sleep(6000)
 }
 
 //  ****
@@ -72,7 +73,7 @@ private fun runSerialRxJava() {
     This will execute all 3 tasks concurrently without specified order.
     It should complete all tasks in 3 seconds in order of 3, 2, 1
  */
-private fun runConcurrent() = GlobalScope.launch(Dispatchers.IO) {
+private fun runConcurrent() = runBlocking {
     awaitAll(
         async { someAsyncTask(2) },
         async { someAsyncTask(1) },
@@ -88,6 +89,7 @@ private fun runConcurrentRxJava() {
     )
         .subscribeOn(Schedulers.io())
         .subscribe()
+    Thread.sleep(4000)
 }
 
 //  ****
@@ -99,25 +101,31 @@ private var sharedValue = 0
 /*
     This will output inconsistent Counter value
  */
-private fun runWithoutCriticalProtection() = GlobalScope.launch {
-    someErrorProneThreadLoop {
-        sharedValue++
+private fun runWithoutCriticalProtection() = runBlocking {
+    GlobalScope.launch {
+        someErrorProneThreadLoop {
+            sharedValue++
+        }
+        println("Counter = $sharedValue")
     }
-    println("Counter = $sharedValue")
+    delay(500)
 }
 
 /*
     This will always output 10000
     Keep in mind not to nest mutexes like the synchronized blocks as it can result in easy deadlock
  */
-private fun runWithCriticalProtection() = GlobalScope.launch {
-    val mutex = Mutex()
-    someErrorProneThreadLoop {
-        mutex.withLock {
-            sharedValue++
+private fun runWithCriticalProtection() = runBlocking {
+    GlobalScope.launch {
+        val mutex = Mutex()
+        someErrorProneThreadLoop {
+            mutex.withLock {
+                sharedValue++
+            }
         }
+        println("Counter = $sharedValue")
     }
-    println("Counter = $sharedValue")
+    delay(500)
 }
 
 private suspend fun someErrorProneThreadLoop(action: suspend () -> Unit) {
@@ -172,7 +180,7 @@ private suspend fun synchronizeSomething(value: Int): Deferred<Boolean> = corout
     I return things nicely 2
     I return things nicely 3
  */
-private fun syncSomething() = GlobalScope.launch {
+private fun syncSomething() = runBlocking {
     launch {
         synchronizeSomething(1).await()
     }

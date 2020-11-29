@@ -9,7 +9,7 @@ fun main() {
     runDummySolution()
     //runChannelSolution()
     //runFlowSolution()
-    //simulateDangerousChannelSituation
+    //simulateDangerousChannelSituation()
 }
 
 //  ****

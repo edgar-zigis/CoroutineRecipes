@@ -5,13 +5,10 @@ import kotlinx.coroutines.*
  */
 
 fun main() {
-    GlobalScope.launch {
-        runDefaultScope()
-        //runSupervisorScope()
-        //testScopeCancellation()
-        //testScopeCancellationWithSupervisor()
-    }
-    Thread.sleep(10000)
+    runDefaultScope()
+    //runSupervisorScope()
+    //testScopeCancellation()
+    //testScopeCancellationWithSupervisor()
 }
 
 //  ****
@@ -35,15 +32,17 @@ private suspend fun someAsyncTask(iteration: Int): Int {
     Example with generic scope.
     All tasks after first exception will be cancelled
  */
-private suspend fun runDefaultScope() = coroutineScope {
-    launch {
-        someAsyncTask(1)
-    }
-    launch {
-        someAsyncTask(2)
-    }
-    launch {
-        someAsyncTask(3)
+private fun runDefaultScope() = runBlocking {
+    coroutineScope {
+        launch {
+            someAsyncTask(1)
+        }
+        launch {
+            someAsyncTask(2)
+        }
+        launch {
+            someAsyncTask(3)
+        }
     }
 }
 
@@ -55,15 +54,17 @@ private suspend fun runDefaultScope() = coroutineScope {
     Example with supervisor scope.
     All tasks will be executed despite the exceptions
  */
-private suspend fun runSupervisorScope() = supervisorScope {
-    launch {
-        someAsyncTask(1)
-    }
-    launch {
-        someAsyncTask(2)
-    }
-    launch {
-        someAsyncTask(3)
+private fun runSupervisorScope() = runBlocking {
+    supervisorScope {
+        launch {
+            someAsyncTask(1)
+        }
+        launch {
+            someAsyncTask(2)
+        }
+        launch {
+            someAsyncTask(3)
+        }
     }
 }
 
@@ -76,7 +77,7 @@ private suspend fun runSupervisorScope() = supervisorScope {
     Scope will be cancelled after method with iteration 3 will be executed.
     Method with iteration 1 won't be executed
  */
-private suspend fun testScopeCancellation() {
+private fun testScopeCancellation() = runBlocking {
     val scope = CoroutineScope(Dispatchers.IO)
 
     scope.launch {
@@ -89,13 +90,15 @@ private suspend fun testScopeCancellation() {
     scope.launch {
         someAsyncTask(5)
     }
+
+    delay(1500)
 }
 
 /*
     Deceiving example with supplied supervisor job.
     No tasks will be cancelled. For proper cancellation the job itself should be cancelled.
  */
-private suspend fun testScopeCancellationWithSupervisor() {
+private fun testScopeCancellationWithSupervisor() = runBlocking {
     val job = SupervisorJob()
     val scope = CoroutineScope(Dispatchers.IO)
 
@@ -109,4 +112,6 @@ private suspend fun testScopeCancellationWithSupervisor() {
     scope.launch(job) {
         someAsyncTask(5)
     }
+
+    delay(4000)
 }

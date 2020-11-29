@@ -7,7 +7,6 @@ import kotlinx.coroutines.channels.consumeEach
 fun main() {
     simulateChannelWithoutBuffer()
     //simulateChannelWithBuffer()
-
     //simulateChannel()
     //simulateBroadcastChannel()
     //simulateConflatedBroadcastChannel()
