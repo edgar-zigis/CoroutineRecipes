@@ -1,5 +1,6 @@
 # Coroutine Recipes
-Playground for Kotlin Coroutines
+Playground for Kotlin Coroutines.<br/>
+Ready to use ***IntelliJ IDEA*** project with basic explanations.
 
 ```
 * Basic async/launch comparisons
