@@ -47,7 +47,17 @@ private fun someAsyncTaskRxJava(iteration: Int): Single<Int> {
 /*
     This will execute all 3 tasks sequentially in specified order.
     It should complete all tasks in 5.5 seconds in order 2, 1, 3
+
+    NOTE! This example was created to compare Deferred to Single.
+    The correct (and simple) usage of serial tasks would be:
+
+    private fun runSerial() = runBlocking {
+        someAsyncTask(2)
+        someAsyncTask(1)
+        someAsyncTask(3)
+    }
  */
+
 private fun runSerial() = runBlocking {
     async { someAsyncTask(2) }.await()
     async { someAsyncTask(1) }.await()
@@ -72,6 +82,16 @@ private fun runSerialRxJava() {
 /*
     This will execute all 3 tasks concurrently without specified order.
     It should complete all tasks in 3 seconds in order of 3, 2, 1
+
+    NOTE! This example was created to compare Deferred to Single.
+    We do not need any result here, so
+    the correct (and simple) usage of concurrent tasks would be:
+
+    private fun runConcurrent() = runBlocking {
+        launch { someAsyncTask(2) }
+        launch { someAsyncTask(1) }
+        launch { someAsyncTask(3) }
+    }
  */
 private fun runConcurrent() = runBlocking {
     awaitAll(
