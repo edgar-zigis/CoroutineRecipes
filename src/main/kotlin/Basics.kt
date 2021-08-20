@@ -168,6 +168,7 @@ private fun contextSwitching() = runBlocking {
     The application does not switch threads. If there would be any other dispatcher (e.g. Unconfined)
     then the result might be different
  */
+@OptIn(DelicateCoroutinesApi::class)
 private fun contextPoolTest() = runBlocking {
     GlobalScope.launch(Dispatchers.IO) {
         println("1")

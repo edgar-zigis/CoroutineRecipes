@@ -77,6 +77,7 @@ fun testBasicFlowDistinctCollection() = runBlocking {
     This will output 0 1 2 2
     debounce is ignoring any values emitted faster than the previous one
  */
+@OptIn(FlowPreview::class)
 fun testBasicFlowDebounceCollection() = runBlocking {
     basicFlow().debounce(80).collect {
         println("BasicFlowDebounceCollect emitted value: $it")
@@ -170,6 +171,7 @@ fun testStateFlow() = runBlocking {
     2. CallbackFlow
     3. ChannelFlow
  */
+@OptIn(DelicateCoroutinesApi::class)
 fun dummyFlow(): Flow<Int> = flow {
     GlobalScope.launch {
         emit(1)
@@ -178,20 +180,22 @@ fun dummyFlow(): Flow<Int> = flow {
     delay(100)
 }
 
+@OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 fun callbackFlow(): Flow<Int> = callbackFlow {
     GlobalScope.launch {
-        offer(1)
-        offer(2)
+        trySend(1)
+        trySend(2)
         close()
     }
     delay(100)
     awaitClose { cancel() }
 }
 
+@OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
 fun channelFlow(): Flow<Int> = channelFlow {
     GlobalScope.launch {
-        offer(1)
-        offer(2)
+        trySend(1)
+        trySend(2)
         close()
     }
     delay(100)
