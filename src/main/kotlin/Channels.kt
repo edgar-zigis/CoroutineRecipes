@@ -57,8 +57,8 @@ fun simulateChannel() = runBlocking {
     val channel = Channel<Int>(capacity = 1)
 
     launch {
-        channel.offer(1)
-        channel.offer(2)
+        channel.trySend(1)
+        channel.trySend(2)
     }
 
     for (i in 0..1) {
@@ -78,12 +78,13 @@ fun simulateChannel() = runBlocking {
     This shall print 3 and 3, because subscriber started listening after the values were sent to the channel
     This works in the same way like RxJava PublishSubject
  */
+@OptIn(ObsoleteCoroutinesApi::class)
 fun simulateBroadcastChannel() = runBlocking {
     val channel = BroadcastChannel<Int>(capacity = 1)
 
     launch {
-        channel.offer(1)
-        channel.offer(2)
+        channel.trySend(1)
+        channel.trySend(2)
     }
 
     for (i in 0..1) {
@@ -95,7 +96,7 @@ fun simulateBroadcastChannel() = runBlocking {
     }
 
     launch {
-        channel.offer(3)
+        channel.trySend(3)
     }
 }
 
@@ -104,12 +105,13 @@ fun simulateBroadcastChannel() = runBlocking {
     the channel first.
     This works in the same way like RxJava BehaviourSubject
  */
+@OptIn(ObsoleteCoroutinesApi::class)
 fun simulateConflatedBroadcastChannel() = runBlocking {
     val channel = ConflatedBroadcastChannel<Int>()
 
     launch {
-        channel.offer(1)
-        channel.offer(2)
+        channel.trySend(1)
+        channel.trySend(2)
     }
 
     launch {
@@ -119,6 +121,6 @@ fun simulateConflatedBroadcastChannel() = runBlocking {
     }
 
     launch {
-        channel.offer(3)
+        channel.trySend(3)
     }
 }

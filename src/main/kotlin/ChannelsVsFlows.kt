@@ -67,6 +67,7 @@ fun runChannelSolution() = runBlocking {
     println("Ready in $time ms")
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 suspend fun CoroutineScope.channelOfResources(): ReceiveChannel<Int> = produce {
     send(getResource(1))
     send(getResource(2))

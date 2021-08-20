@@ -121,6 +121,7 @@ private var sharedValue = 0
 /*
     This will output inconsistent Counter value
  */
+@OptIn(DelicateCoroutinesApi::class)
 private fun runWithoutCriticalProtection() = runBlocking {
     GlobalScope.launch {
         someErrorProneThreadLoop {
@@ -135,6 +136,7 @@ private fun runWithoutCriticalProtection() = runBlocking {
     This will always output 10000
     Keep in mind not to nest mutexes like the synchronized blocks as it can result in easy deadlock
  */
+@OptIn(DelicateCoroutinesApi::class)
 private fun runWithCriticalProtection() = runBlocking {
     GlobalScope.launch {
         val mutex = Mutex()
