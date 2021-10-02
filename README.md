@@ -17,3 +17,5 @@ Ready to use ***IntelliJ IDEA*** project with basic explanations.
 * State & Shared Flows
 * Callback & Channel Flows
 ```
+
+**Project is under continuous development**
