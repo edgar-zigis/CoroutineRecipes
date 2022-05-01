@@ -70,7 +70,7 @@ fun simulateChannel() = runBlocking {
     }
 
     launch {
-        channel.offer(3)
+        channel.trySend(3)
     }
 }
 
